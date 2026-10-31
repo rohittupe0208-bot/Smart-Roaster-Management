@@ -2,34 +2,33 @@
 
 **Datastraw Tech Internship Assessment | Built by Rohit Tupe**
 
-A fully browser-based, zero-dependency Smart Roster Management System for D2C operations teams managing 30+ employees across multiple brands, processes, and pods.
+I built SmartRoster as a browser-based, zero-dependency roster management system for D2C operations teams managing employees across brands, processes, and pods.
 
 ---
 
-## Quick start
+## Run locally
 
-### Windows (PowerShell)
+I use Python's built-in web server to run the app locally on Windows:
 
-1. Open PowerShell.
-2. Change to the project folder:
+1. Open PowerShell and change to the project folder:
 
    ```powershell
    cd D:\project1
    ```
 
-3. Start the local web server:
+2. Start the local web server:
 
    ```powershell
    python -m http.server 8000
    ```
 
-   If `python` is not recognized, try `py -m http.server 8000`.
-4. Leave PowerShell open and visit **http://localhost:8000** in your browser.
-5. To stop the server, return to PowerShell and press **Ctrl+C**.
+   If `python` is not recognized, I use `py -m http.server 8000` instead.
+3. Keep PowerShell open and visit **http://localhost:8000** in your browser.
+4. To stop the server, press **Ctrl+C** in PowerShell.
 
-Run the server from the project folder so the browser serves this app, not another folder. If port 8000 is already in use, use `python -m http.server 8001` instead and open **http://localhost:8001**.
+I start the server from the project folder so it serves this app. If port 8000 is already in use, I use `python -m http.server 8001` and visit **http://localhost:8001**.
 
-The app has no install or build step. You can also open `index.html` directly in a modern browser, but the local server is recommended.
+I don't need to install dependencies or build the app. I can open `index.html` directly in a modern browser, but I recommend the local server.
 
 ```
 project1/
@@ -44,29 +43,18 @@ project1/
 
 ---
 
-## Deploy for free
+## Deploy on Netlify
 
-SmartRoster is a static site: it needs no server, build command, or package installation. The files in the project root can be served directly.
+I deploy SmartRoster as a static site from the project root. I don't need a server, build command, or package installation. The committed [`netlify.toml`](./netlify.toml) sets `publish = "."`, which is the correct publish directory for this project: `index.html` and the app assets are in the root.
 
-### Free hosting options
+To deploy from GitHub, I:
 
-| Host | Best for | Notes |
-|---|---|---|
-| **GitHub Pages** | The simplest option for this GitHub-hosted project | Publish the repository root from the `main` branch. Use a public repository for the free Pages plan. |
-| **Cloudflare Pages** | Git-based deploys and fast global delivery | Connect the repository; leave the build command empty and publish the project root. |
-| **Netlify** | A straightforward Git-connected deploy | Import the repository, use no build command, and set the publish directory to the project root (`.`). |
-| **Vercel** | Git-based deploys and preview URLs | Import the repository as a static project with no build command. |
+1. Push the project to the GitHub repository's `main` branch.
+2. Sign in to Netlify, choose **Add new site → Import an existing project**, and connect GitHub.
+3. Select the SmartRoster repository. I leave the build command empty and use `.` as the publish directory; Netlify can read the publish directory from `netlify.toml`.
+4. Choose **Deploy site**. Netlify gives me a public URL and deploys future commits pushed to the connected branch.
 
-Free-plan terms and limits can change; check each provider's current plan before choosing.
-
-### Publish with GitHub Pages
-
-1. Make sure `index.html`, `style.css`, `data.js`, `scheduler.js`, `app.js`, and `pages.js` are committed and pushed to the GitHub repository's `main` branch.
-2. In the repository, open **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/(root)`, then save.
-4. Wait for the Pages deployment to finish. The site URL will appear in **Settings → Pages**.
-
-No build step is needed. The site uses browser `localStorage`, so roster data is saved only in the browser and origin where it was entered; it is not shared with teammates or synced across devices. Moving from localhost to the hosted URL starts with separate browser storage. Do not use this deployment for real employee data or shared team operations until authentication and a shared backend are added.
+I store roster data in browser `localStorage`, not on Netlify. Data is specific to the browser and site origin, so the deployed site does not share data with localhost or other users. I would not use this deployment for real employee data until I add authentication and a shared backend.
 
 ---
 
@@ -141,43 +129,30 @@ I would first add a roster approval workflow: pod leads review a generated roste
 
 ---
 
-## 🔧 Technology Stack
+## 🔧 Technology I used
 
-- **HTML5 / Vanilla JS / CSS3** — Zero dependencies, runs in any browser
-- **localStorage** — Persistent client-side storage (no server needed)
-- **Google Fonts (Inter)** — Typography
-- **Responsive interface** — Clean, light styling with mobile layouts and keyboard focus states
-
----
-
-## 📝 Assumptions
-
-1. **Weekly off is fixed per employee** (same day every week). The system allows this to be changed per-employee, and manual overrides can handle occasional exceptions.
-2. **Public holidays are configurable** — the sample list uses common Indian national holidays.
-3. **Approved leaves always override weekly offs** — if an employee is approved for leave on their weekly off day, it shows as "leave" (no functional difference, but tracked separately).
-4. **A pod lead can also be operationally assigned** to brands (e.g., Arjun Mehta handles UrbanPulse CS while leading Alpha Pod).
-5. **Comp-off is treated the same as leave** for coverage purposes.
-6. **Roster regeneration does not delete manual overrides** — overrides persist and are re-applied after regeneration.
-7. **Shift overlap detection applies only when both shift times are configured** — assignments without shift times are not assumed to conflict.
+- **HTML5 / Vanilla JS / CSS3** — I built the app without framework dependencies
+- **localStorage** — I persist data in the user's browser, with no server
+- **Google Fonts (Inter)** — I use Inter for typography
+- **Responsive interface** — I support mobile layouts and keyboard focus states
 
 ---
 
-## Deploy on Netlify
+## 📝 My assumptions
 
-The app is static and has no build or install step. The included `netlify.toml` publishes the project root.
-
-1. Push the project to the `main` branch of the GitHub repository.
-2. In Netlify, choose **Add new site → Import an existing project** and connect the GitHub repository.
-3. Keep the build command empty. Netlify reads the publish directory (`.`) from `netlify.toml`.
-4. Choose **Deploy site**. Netlify will provide a public URL and automatically deploy future commits pushed to the connected branch.
-
-Roster data is stored in browser `localStorage`, not on Netlify or shared with other users. The deployed site has separate browser storage from localhost; do not enter real employee data until a secured shared backend is added.
+1. I assign one fixed weekly off day to each employee, with day-level overrides for exceptions.
+2. I make public holidays configurable and include common Indian national holidays in the sample.
+3. I let approved leave take precedence over a weekly off so it remains separately tracked.
+4. I allow pod leads to also have operational assignments.
+5. I treat comp-off like leave when checking coverage.
+6. I preserve and reapply manual overrides when regenerating a roster.
+7. I flag shift overlaps only when both assignments have configured shift times.
 
 ---
 
 ## 📬 Submission
 
-Before submitting, deploy the static files to a public host and replace the placeholders below with working links. Record a 3–5 minute demo showing roster generation, the five roster views, a detected conflict, and how changing availability or assignments triggers revalidation.
+For my submission, I will deploy the static files, replace the placeholders below with working links, and record a 3–5 minute demo showing roster generation, the five roster views, a detected conflict, and revalidation after an availability or assignment change.
 
 **Application URL:** [Add your deployed application URL]  
 **GitHub Repo:** [Add your public repository URL]  
