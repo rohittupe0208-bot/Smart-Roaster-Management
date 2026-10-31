@@ -45,9 +45,9 @@ project1/
 
 ## Deploy on Netlify
 
-I deploy SmartRoster as a static site from the project root. I don't need a server, build command, or package installation. The committed [`netlify.toml`](./netlify.toml) sets `publish = "."`, which is the correct publish directory for this project: `index.html` and the app assets are in the root.
+I deployed SmartRoster as a static site on Netlify: [Open the live application](https://sparkly-cheesecake-ef96bf.netlify.app/). I don't need a server, build command, or package installation. The committed [`netlify.toml`](./netlify.toml) sets `publish = "."`, which is the correct publish directory for this project: `index.html` and the app assets are in the root.
 
-To deploy from GitHub, I:
+To connect or redeploy it from GitHub, I:
 
 1. Push the project to the GitHub repository's `main` branch.
 2. Sign in to Netlify, choose **Add new site → Import an existing project**, and connect GitHub.
@@ -152,12 +152,14 @@ I would first add a roster approval workflow: pod leads review a generated roste
 
 ## 📬 Submission
 
-For my submission, I will deploy the static files, replace the placeholders below with working links, and record a 3–5 minute demo showing roster generation, the five roster views, a detected conflict, and revalidation after an availability or assignment change.
+- **Application:** [Open SmartRoster](https://sparkly-cheesecake-ef96bf.netlify.app/)
+- **GitHub repository:** [SmartRoster on GitHub](https://github.com/rohittupe0208-bot/Smart-Roaster-Management)
+- **LinkedIn:** [Rohit Tupe](https://www.linkedin.com/in/rohit-tupe-54525b3b3/)
+- **Demo video:** [Watch the SmartRoster demo](https://drive.google.com/drive/folders/1q2166Rv48NVG0v-J2lTbJgaJUD72QwuX?usp=sharing)
 
-**Application URL:** [Add your deployed application URL]  
-**GitHub Repo:** [Add your public repository URL]  
-**Demo video:** [Add your demo video URL]  
-**LinkedIn:** [Add your LinkedIn profile URL]
+**Approach:** I modeled employees, pods, brands, processes, and assignments separately so the same rules support both single-employee and shared staffing. I generate rosters deterministically, validate availability and coverage, and surface conflicts for managers to resolve—automating predictable checks while keeping operational decisions under human control.
+
+My demo covers roster generation, the five roster views, conflict detection, and revalidation after availability or assignment changes.
 
 ---
 
