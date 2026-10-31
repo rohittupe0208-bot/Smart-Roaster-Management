@@ -1,6 +1,6 @@
 # SmartRoster — Smart Roster Management System
 
-**Datastraw Tech Internship Assessment | Built by [Your Name]**
+**Datastraw Tech Internship Assessment | Built by Rohit Tupe**
 
 A fully browser-based, zero-dependency Smart Roster Management System for D2C operations teams managing 30+ employees across multiple brands, processes, and pods.
 
@@ -41,6 +41,32 @@ project1/
 ├── pages.js        → Employees, Brands, Leaves, Conflicts, Settings pages
 └── README.md       → This file
 ```
+
+---
+
+## Deploy for free
+
+SmartRoster is a static site: it needs no server, build command, or package installation. The files in the project root can be served directly.
+
+### Free hosting options
+
+| Host | Best for | Notes |
+|---|---|---|
+| **GitHub Pages** | The simplest option for this GitHub-hosted project | Publish the repository root from the `main` branch. Use a public repository for the free Pages plan. |
+| **Cloudflare Pages** | Git-based deploys and fast global delivery | Connect the repository; leave the build command empty and publish the project root. |
+| **Netlify** | A straightforward Git-connected deploy | Import the repository, use no build command, and set the publish directory to the project root (`.`). |
+| **Vercel** | Git-based deploys and preview URLs | Import the repository as a static project with no build command. |
+
+Free-plan terms and limits can change; check each provider's current plan before choosing.
+
+### Publish with GitHub Pages
+
+1. Make sure `index.html`, `style.css`, `data.js`, `scheduler.js`, `app.js`, and `pages.js` are committed and pushed to the GitHub repository's `main` branch.
+2. In the repository, open **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/(root)`, then save.
+4. Wait for the Pages deployment to finish. The site URL will appear in **Settings → Pages**.
+
+No build step is needed. The site uses browser `localStorage`, so roster data is saved only in the browser and origin where it was entered; it is not shared with teammates or synced across devices. Moving from localhost to the hosted URL starts with separate browser storage. Do not use this deployment for real employee data or shared team operations until authentication and a shared backend are added.
 
 ---
 
