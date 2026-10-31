@@ -105,89 +105,39 @@ If you opened an earlier version of the app in the same browser, its saved data 
 
 ---
 
-## Design and implementation
+## My design decisions
 
-### 1. Data Model
+### 1. How I model the team
 
-The system models five core entities and their relationships:
+I model employees, pods, brands, and processes as separate entities. Each employee belongs to a pod and has a weekly off day; each pod has a lead; and each brand belongs to a pod. Processes are shared types. An assignment links an employee to a brand and process, while a brand-process rule stores its working calendar and minimum staffing. This lets one employee serve several assignments and lets an assignment have multiple employees.
 
-- **Employee** → belongs to a `Pod`, has a `weeklyOffDay` (0=Sun, 6=Sat)
-- **Pod** → has a `leadId` pointing to one employee
-- **Brand** → belongs to a `Pod`
-- **Process** → global types (CS, ACC, NDR, RET, QA)
-- **BrandProcessRule** → links a Brand + Process with a built-in or custom weekday `workingRule`, default `minStaff`, and optional weekday-specific minimums
-- **Assignment** → links Employee + Brand + Process, with optional shift start/end times for overlap validation
+### 2. How I generate and validate a roster
 
-This normalised relational design means a single employee can be assigned to multiple brands and processes, and a single brand-process can have multiple employees (for redundancy or minStaff > 1 scenarios).
+I generate a roster deterministically for each day in the selected month. I apply employee status precedence (`leave > comp-off > weekly-off > work`), check whether each brand-process rule requires work that day, and count assigned employees who are available. I compare that count with the configured minimum (including weekday-specific minimums) and report coverage gaps. I also check configured shift times for overlaps.
 
-### 2. Roster Generation
+### 3. Single-employee and multi-employee brands
 
-For each date in the selected month, the scheduler:
+I use the same assignment and staffing-rule model for both cases. A single-person brand-process has one assignment and normally requires one available employee; multi-process brands can have different employees per process. I also model a shared process explicitly: NestNook CS has two assigned employees and requires both (`minStaff=2`).
 
-1. Checks each employee's status: `leave > comp-off > weekly-off > work`
-2. For each `BrandProcessRule`, evaluates whether the date is a **required working day** based on the rule (`365`, `no-holidays`, `no-sunday-holidays`, or configured custom weekdays)
-3. Finds all employees assigned to that brand-process combination
-4. Counts how many of them are in `work` status
-5. Applies a weekday-specific minimum when configured; otherwise uses the default `minStaff`
-6. If available staff is below the minimum → records a conflict with full details
-7. Checks configured assignment shift times for overlapping responsibilities
+### 4. When the only assigned employee is unavailable
 
-This is a **deterministic constraint-checking** approach (not stochastic), which ensures reproducibility and explainability. Given the operational nature of the problem (humans remain in control of assignments), this is the correct tradeoff.
+I flag a coverage conflict on a required working day, show its date and brand-process details in the Conflict Center, mark the gap in the heatmap, and suggest available pod members as backups. I leave approving a backup or rescheduling leave to the operations manager.
 
-### 3. Single vs Multi-Employee Brands
+### 5. Conflicting requirements and insufficient staffing
 
-The sample assigns different employees to different processes within a brand. Six one-process brands have one assigned employee; multi-process brands have separate employees per process. NestNook additionally has two employees sharing CS (`minStaff=2`), so both emp30 and emp31 must be available on required days. This demonstrates process-level separation across the sample, rather than the assessment's approximately 80% single-dedicated-employee mix.
+I treat working calendars and minimum staffing as requirements, and report staffing shortfalls and configured shift overlaps rather than silently accepting them. Weekly offs can be overridden for a specific day. A manager decides how to resolve a conflict, such as assigning a backup or rescheduling leave.
 
-The system handles both cases identically through the `Assignment` + `BrandProcessRule` tables. The distinction is purely in how many rows exist per brand-process pair.
+### 6. What I automate and what I leave to people
 
-### 4. Single Employee Unavailability
+I automate roster generation from configured rules, leave and holiday application, conflict detection, backup suggestions, and CSV export. I leave assignments, leave approvals, conflict resolution, day overrides, and final approval to people. This keeps deterministic work consistent while leaving operational trade-offs to the team.
 
-If an employee is the sole person assigned to a brand-process (e.g. SwiftCart-CS handled only by Sneha Patel), and that employee goes on leave on a required working day, the system:
-- detects a **critical conflict** (0/1 available vs 1 required)
-- surfaces it in the Conflict Center with date, brand, process, and reason
-- suggests available pod members as potential backups
-- flags the gap on the brand's coverage heatmap as ⚠️
+### 7. What I would change if the team doubled
 
-The operations manager must then either approve a backup assignment or move the leave to a non-required day.
+For roughly 60 employees and 40 brands, I would move from browser-only `localStorage` to a shared database and authenticated API so data and permissions work across users. I would add pagination or virtual scrolling for larger roster grids, then consider caching and regenerating only the schedules affected by a change.
 
-### 5. Conflicting Requirements / Insufficient Staffing
+### 8. What I would improve with one more week
 
-The system distinguishes:
-- **Mandatory constraints**: BrandProcessRule `workingRule` and `minStaff` → always flagged as conflicts
-- **Preferences**: Employee `weeklyOffDay` → can be overridden manually by clicking the cell and changing the status
-
-Coverage gaps and configured shift overlaps are never silently dropped. If they cannot be auto-resolved, they appear in the Conflict Center with explanations. The operations manager retains full control.
-
-### 6. Automation vs Human Control
-
-| Automated | Human-Controlled |
-|---|---|
-| Monthly roster generation from rules | Assignment of employees to brands/processes |
-| Weekly-off and holiday application | Leave approval |
-| Conflict detection and gap flagging | Resolving gaps (pickup assignments, leave reschedule) |
-| Backup employee suggestions | Final roster approval/publish |
-| CSV export | Override any individual day's status |
-
-The guiding principle: **automate what is deterministic, surface what requires judgement**.
-
-### 7. Scalability
-
-If the team doubled (60+ employees, 40+ brands):
-
-- The current data model scales horizontally — more rows, same logic
-- The scheduling engine runs in O(employees × days × brandProcessRules) which is well within browser limits even at 100 employees
-- The main bottleneck would be UI rendering of large roster grids → would need **virtual scrolling** or server-side pagination
-- Would move storage from localStorage to a proper database (PostgreSQL/Supabase) with a REST API (FastAPI or Node.js)
-- Would add roster caching and incremental regeneration (only re-run affected employees when a leave changes)
-
-### 8. One More Week Improvements
-
-In priority order:
-1. **Roster approval workflow** — Pod leads review before operations manager publishes
-2. **Fair weekly-off distribution** — Rotate Sunday offs so no employee always gets the worst days
-3. **Automatic schedule optimization after configuration changes** — Existing saved rosters are revalidated when leaves, holidays, assignments, staffing rules, or employee availability change; automatic schedule optimization could be added
-4. **Google Sheets integration** — Direct export/sync for teams already using Sheets
-5. **Preference-based scheduling** — Allow employees to mark preferred off days; scheduler respects these when coverage allows
+I would first add a roster approval workflow: pod leads review a generated roster before an operations manager publishes it. That would add a clear human review step without hiding unresolved coverage issues.
 
 ---
 
