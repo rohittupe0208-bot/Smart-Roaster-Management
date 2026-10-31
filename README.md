@@ -212,6 +212,19 @@ In priority order:
 
 ---
 
+## Deploy on Netlify
+
+The app is static and has no build or install step. The included `netlify.toml` publishes the project root.
+
+1. Push the project to the `main` branch of the GitHub repository.
+2. In Netlify, choose **Add new site → Import an existing project** and connect the GitHub repository.
+3. Keep the build command empty. Netlify reads the publish directory (`.`) from `netlify.toml`.
+4. Choose **Deploy site**. Netlify will provide a public URL and automatically deploy future commits pushed to the connected branch.
+
+Roster data is stored in browser `localStorage`, not on Netlify or shared with other users. The deployed site has separate browser storage from localhost; do not enter real employee data until a secured shared backend is added.
+
+---
+
 ## 📬 Submission
 
 Before submitting, deploy the static files to a public host and replace the placeholders below with working links. Record a 3–5 minute demo showing roster generation, the five roster views, a detected conflict, and how changing availability or assignments triggers revalidation.
